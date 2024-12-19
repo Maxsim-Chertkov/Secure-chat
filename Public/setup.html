@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Setup</title>
+    <script>
+        // Хранилище комнат (эмулируется локальным массивом, в реальности - на сервере)
+        let rooms = {
+            "publicRoom1": { type: "public", users: [] },
+            "localRoom1": { type: "local", password: "12345", users: [] }
+        };
+
+        // Функция для создания новой комнаты
+        function createRoom() {
+            let roomName = document.getElementById("newRoomName").value;
+            let roomType = document.querySelector('input[name="newRoomType"]:checked').value;
+            let roomPassword = roomType === "local" ? document.getElementById("newRoomPassword").value : null;
+
+            if (roomName.trim() === "") {
+                alert("Введите название комнаты!");
+                return;
+            }
+
+            if (roomType === "local" && roomPassword.trim() === "") {
+                alert("Введите пароль для локальной комнаты!");
+                return;
+            }
+
+            // Проверка, существует ли уже такая комната
+            if (rooms[roomName]) {
+                alert("Комната с таким названием уже существует. Пожалуйста, выберите другое название.");
+                return;
+            }
+
+            // Добавление комнаты в хранилище
+            rooms[roomName] = {
+                type: roomType,
+                password: roomPassword,
+                users: []
+            };
+
+            alert(`Комната "${roomName}" успешно создана!`);
+        }
+
+        // Функция для начала чата (присоединение к существующей комнате)
+        function startChat() {
+            let chatType = document.querySelector('input[name="chatType"]:checked').value;
+            let nickname = document.getElementById("nickname").value;
+            let roomName = document.getElementById("roomName").value;
+
+            if (nickname.trim() === "") {
+                alert("Введите свой псевдоним!");
+                return;
+            }
+
+            if (roomName.trim() === "") {
+                alert("Введите название комнаты!");
+                return;
+            }
+
+            // Проверка типа чата
+            if (chatType === "public") {
+                // Проверка публичной комнаты
+                if (rooms[roomName] && rooms[roomName].type === "public") {
+                    joinRoom(roomName, nickname);
+                } else {
+                    alert("Комната не найдена или не является публичной.");
+                }
+            } else if (chatType === "local") {
+                let password = prompt("Введите пароль для комнаты:");
+                if (rooms[roomName] && rooms[roomName].type === "local" && rooms[roomName].password === password) {
+                    joinRoom(roomName, nickname);
+                } else {
+                    alert("Неверный пароль или комната не найдена.");
+                }
+            }
+        }
+
+        // Функция для присоединения к комнате
+        function joinRoom(roomName, nickname) {
+            // Добавляем пользователя в комнату
+            rooms[roomName].users.push(nickname);
+            alert(`Вы присоединились к комнате: ${roomName}`);
+            // Переход на страницу комнаты
+            window.location.href = `chatroom.html?room=${roomName}&nickname=${nickname}`;
+        }
+
+        // Удаление пустых комнат
+        function checkEmptyRooms() {
+            for (let room in rooms) {
+                if (rooms[room].users.length === 0) {
+                    delete rooms[room];
+                    console.log(`Комната ${room} удалена`);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+<h1>Настройка чата</h1>
+
+<h2>Присоединение к существующей комнате</h2>
+
+<p>Выберите тип чата:</p>
+<label><input type="radio" name="chatType" value="public" checked> Публичный</label>
+<br>
+<label><input type="radio" name="chatType" value="local"> Локальный (защищенный)</label>
+
+<br><br>
+
+<p>Введите свой псевдоним:</p>
+<input type="text" id="nickname" placeholder="Ваш псевдоним">
+
+<p>Введите название комнаты:</p>
+<input type="text" id="roomName" placeholder="Название комнаты">
+
+<br><br>
+
+<button onclick="startChat()">Начать чат</button>
+
+<hr>
+
+<h2>Создание новой комнаты</h2>
+
+<p>Введите название новой комнаты:</p>
+<input type="text" id="newRoomName" placeholder="Название новой комнаты">
+
+<p>Выберите тип новой комнаты:</p>
+<label><input type="radio" name="newRoomType" value="public" checked> Публичная</label>
+<br>
+<label><input type="radio" name="newRoomType" value="local"> Локальная (с паролем)</label>
+
+<p>Введите пароль для локальной комнаты (если выбрано):</p>
+<input type="password" id="newRoomPassword" placeholder="Пароль">
+
+<br><br>
+
+<button onclick="createRoom()">Создать комнату</button>
+
+</body>
+</html>

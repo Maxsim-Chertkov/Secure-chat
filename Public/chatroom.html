@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <script>
+        // Получение параметров комнаты и пользователя
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomName = urlParams.get('room');
+        const nickname = urlParams.get('nickname');
+
+        let messages = []; // Сообщения в комнате
+
+        // Функция для отправки сообщения
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            if (message.trim() === "") {
+                alert("Введите сообщение!");
+                return;
+            }
+            messages.push({ user: nickname, text: message });
+            displayMessages();
+            document.getElementById("messageInput").value = ""; // Очистить поле
+        }
+
+        // Отображение сообщений
+        function displayMessages() {
+            const messageArea = document.getElementById("messageArea");
+            messageArea.innerHTML = ""; // Очистить перед обновлением
+
+            messages.forEach(msg => {
+                const msgElement = document.createElement("p");
+                msgElement.textContent = `${msg.user}: ${msg.text}`;
+                messageArea.appendChild(msgElement);
+            });
+        }
+
+        // Функция для выхода из комнаты
+        function leaveRoom() {
+            alert("Вы покидаете комнату.");
+            window.location.href = "index.html";
+            // Здесь можно добавить логику удаления пользователя из комнаты
+        }
+    </script>
+</head>
+<body>
+
+<h1>Комната: <span id="roomNameDisplay"></span></h1>
+<h2>Пользователь: <span id="nicknameDisplay"></span></h2>
+
+<div id="messageArea" style="border: 1px solid #ccc; height: 200px; overflow-y: scroll; margin-bottom: 10px;">
+    <!-- Сообщения будут появляться здесь -->
+</div>
+
+<input type="text" id="messageInput" placeholder="Введите сообщение">
+<button onclick="sendMessage()">Отправить</button>
+
+<br><br>
+
+<button onclick="leaveRoom()">Покинуть комнату</button>
+
+<script>
+    // Отображение названия комнаты и пользователя
+    document.getElementById("roomNameDisplay").textContent = roomName;
+    document.getElementById("nicknameDisplay").textContent = nickname;
+</script>
+
+</body>
+</html>
